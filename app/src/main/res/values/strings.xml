@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Ohio COVID Tracker</string>
+    <string name="daily_counts">Daily Counts</string>
 </resources>
