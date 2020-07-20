@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
             }
             if (date.isEmpty() || cases.isEmpty())
                 throw new Exception("Issue getting date or cases");
-            Log.i("File Contents; Date", date);
-            Log.i("File Contents; Cases ", cases);
+            Log.i("Info", "File Contents; Date " + date);
+            Log.i("Info", "File Contents; Cases " + cases);
             r.close();
             inputStream.close();
         } catch (Exception e) { // No data saved, scrape data
