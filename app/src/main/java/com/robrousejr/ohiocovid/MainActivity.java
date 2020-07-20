@@ -17,24 +17,16 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
-    final String url = "https://covidtracking.com/data/state/ohio";
+    final String url = "https://covidtracking.com/data/state/ohio"; // Ohio URL
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button btn = (Button) findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getWebsite();
-            }
-        });
+        getWebsite();
     }
 
     public void getWebsite() {
-        Log.i("Info", "getWebsite()");
-
         new Thread(new Runnable() {
             @Override
             public void run() {
