@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         String date = "";
         String cases = "";
+        Date dateObj = null;
         boolean isScrape = false; // Should we scrape again or not
 
         // Read date/cases from file
@@ -54,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
             }
             if (date.isEmpty() || cases.isEmpty())
                 throw new Exception("Issue getting date or cases");
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            dateObj = formatter.parse(date);
             Log.i("Info", "File Contents; Date " + date);
             Log.i("Info", "File Contents; Cases " + cases);
             r.close();
@@ -67,7 +72,14 @@ public class MainActivity extends AppCompatActivity {
         if(isScrape) {
             getWebsite();
         } else {
+            // Last scrape wasn't today
+            if (!date.equals(new Date())) {
+                Log.i("Info", "Last scrape wasn't today");
+                getWebsite();
+            }
+
             Log.i("Info", "Setting text from previously found cases: " + cases);
+            Log.i("Info", "dateObj toString: " + date.toString());
             final String finalCases = cases;
             TextView txtView = (TextView) findViewById(R.id.output);
             txtView.setText(cases);
