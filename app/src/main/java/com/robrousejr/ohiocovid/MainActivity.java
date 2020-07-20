@@ -67,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
         if(isScrape) {
             getWebsite();
         } else {
-            Log.i("Info", "Need to figure out what to do here");
+            Log.i("Info", "Setting text from previously found cases: " + cases);
+            final String finalCases = cases;
+            TextView txtView = (TextView) findViewById(R.id.output);
+            txtView.setText(cases);
         }
 
     }
