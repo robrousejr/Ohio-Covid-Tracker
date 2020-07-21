@@ -73,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
             getWebsite();
         } else {
             // Last scrape wasn't today
-            if (!date.equals(new Date())) {
-                Log.i("Info", "Last scrape wasn't today");
+            if (dateObj.compareTo(new Date()) == 0) {
+                Log.i("Info", "Last scrape wasn't today. Date: " + dateObj.toString());
+                Log.i("Info", "Comparing Dates output: " + dateObj.compareTo(new Date()));
                 getWebsite();
             }
 
