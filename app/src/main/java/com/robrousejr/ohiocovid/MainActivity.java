@@ -23,9 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -69,19 +67,10 @@ public class MainActivity extends AppCompatActivity {
             isScrape = true;
         }
 
-        if(isScrape) {
+        // Scraping needed
+        if(isScrape || !compareDateDays(dateObj, new Date())) {
             getWebsite();
         } else {
-            // Last scrape wasn't today
-            if (dateObj.compareTo(new Date()) == 0) {
-                Log.i("Info", "Last scrape wasn't today. Date: " + dateObj.toString());
-                Log.i("Info", "Comparing Dates output: " + dateObj.compareTo(new Date()));
-                getWebsite();
-            }
-
-            Log.i("Info", "Setting text from previously found cases: " + cases);
-            Log.i("Info", "dateObj toString: " + date.toString());
-            final String finalCases = cases;
             TextView txtView = (TextView) findViewById(R.id.output);
             txtView.setText(cases);
         }
@@ -116,12 +105,10 @@ public class MainActivity extends AppCompatActivity {
                     outputStream.write(output.getBytes());
                     outputStream.close();
                 } catch (FileNotFoundException e) {
-                    Log.e("Error", e.getMessage());
                     Log.e("Error", "File not found");
                     e.printStackTrace();
                 } catch (IOException e) {
-                    e.printStackTrace();
-                    Log.e("Error", e.getMessage());
+                    Log.e("Error", "IOException Error");
                 }
 
                 runOnUiThread(new Runnable() {
@@ -135,5 +122,13 @@ public class MainActivity extends AppCompatActivity {
 
         }).start();
     }
+
+    /**
+     * Compares two dates to see if they're on the same day of a month
+     */
+    public boolean compareDateDays(Date dOne, Date dTwo) {
+        return dOne.getDate() == dTwo.getDate();
+    }
+
 
 }
