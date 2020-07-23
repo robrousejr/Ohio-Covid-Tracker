@@ -13,6 +13,7 @@ import android.widget.TextView;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
@@ -22,14 +23,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     final String url = "https://covidtracking.com/data/state/ohio"; // Ohio URL
     final String filename = "info";
+
+    List<DateCases> dateCases = new ArrayList<DateCases>(); // All dates and case numbers
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +88,6 @@ public class MainActivity extends AppCompatActivity {
             TextView txtView = (TextView) findViewById(R.id.output);
             txtView.setText(cases);
         }
-
     }
 
     /**
@@ -96,11 +107,36 @@ public class MainActivity extends AppCompatActivity {
                    Element totalCasesElement = doc.select("tbody tr td").first();
                    String totalCases = totalCasesElement.text();
                    builder.append(totalCases);
-                } catch (IOException e) {
+
+                   // Print out new cases from table
+                    Elements tableRows = doc.select(".state-history-table tr");
+
+                    // Iterate through rows and add all dateCases
+                    for(Element e : tableRows) {
+                        Elements tableCells = e.getElementsByTag("td");
+                        String date[] = tableCells.get(0).text().split(" ");
+                        Calendar calendar = Calendar.getInstance();
+                        SimpleDateFormat formatter = new SimpleDateFormat("MMM"); // 3-letter month name
+
+                        String  month = String.format("%02d",formatter.parse(date[1]).getMonth() + 1); // 2 number month
+                        String dayOfMonth = String.format("%02d", Integer.parseInt(date[2])); // 2 number day
+                        String year = date[3];
+                        Date finalDate = parseDate(year + "-" + month + "-" + dayOfMonth); // Final date
+                        DateCases dc = new DateCases(finalDate, NumberFormat.getNumberInstance(java.util.Locale.US).parse(tableCells.get(3).text()).intValue());
+                        dateCases.add(dc);
+                    }
+
+                    for(DateCases d: dateCases) {
+                        Log.i("DateCase: ", d.toString());
+                    }
+                } catch (IOException | ParseException e) {
                     Log.e("Error", e.getMessage());
                 }
 
                 try {
+                    // Todo: Save dateCases
+
+                    // Save info
                     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
                     String output = formatter.format(new Date()) + "\n" + builder.toString();
                     FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
@@ -118,6 +154,8 @@ public class MainActivity extends AppCompatActivity {
                     public void run() {
                         TextView output = (TextView) findViewById(R.id.output);
                         output.setText(builder.toString());
+
+                        // Todo: Set graph here to display from dateCases
                     }
                 });
             }
@@ -130,6 +168,14 @@ public class MainActivity extends AppCompatActivity {
      */
     public boolean compareDateDays(Date dOne, Date dTwo) {
         return dOne.getDate() == dTwo.getDate();
+    }
+
+    public Date parseDate(String date) {
+        try {
+            return new SimpleDateFormat("yyyy-MM-dd", Locale.US).parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 
 
