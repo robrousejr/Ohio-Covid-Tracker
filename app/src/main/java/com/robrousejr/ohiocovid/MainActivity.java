@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String date = "";
+        String lastRunDate = "";
         String cases = "";
         Date dateObj = null;
         boolean isScrape = false; // Should we scrape again or not
@@ -48,17 +48,15 @@ public class MainActivity extends AppCompatActivity {
             int i = 0;
             while ((line = r.readLine()) != null) {
                 if(i == 0)
-                    date = line; // Date on first line
+                    lastRunDate = line; // Date on first line
                 else if (i == 1)
                     cases = line; // Number of cases on second line
                 ++i;
             }
-            if (date.isEmpty() || cases.isEmpty())
+            if (lastRunDate.isEmpty() || cases.isEmpty())
                 throw new Exception("Issue getting date or cases");
             DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            dateObj = formatter.parse(date);
-            Log.i("Info", "File Contents; Date " + date);
-            Log.i("Info", "File Contents; Cases " + cases);
+            dateObj = formatter.parse(lastRunDate);
             r.close();
             inputStream.close();
         } catch (Exception e) { // No data saved, scrape data
@@ -66,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
             Log.e("Error", e.getMessage());
             isScrape = true;
         }
+
+        // Logging
+        Log.i("Last Scraping Date: ", lastRunDate.toString());
+        Log.i("Saved Covid Case #", cases);
 
         // Scraping needed
         if(isScrape || !compareDateDays(dateObj, new Date())) {
