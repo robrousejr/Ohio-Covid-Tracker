@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
             String line;
             int i = 0;
             while ((line = r.readLine()) != null) {
+                Log.i("File Contents: ", line);
                 if(i == 0)
                     lastRunDate = line; // Date on first line
                 else if (i == 1)
@@ -136,9 +137,14 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // Todo: Save dateCases
 
-                    // Save info
+                    // Save info to file
                     DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                    String output = formatter.format(new Date()) + "\n" + builder.toString();
+                    String output = formatter.format(new Date()) + "\n" + builder.toString() + "\n";
+
+                    for(DateCases c : dateCases){
+                        output += c.getDate().toString() + "\t" + c.getCases() + "\n";
+                    }
+
                     FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
                     outputStream.write(output.getBytes());
                     outputStream.close();
