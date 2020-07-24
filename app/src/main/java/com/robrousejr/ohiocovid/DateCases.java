@@ -1,5 +1,6 @@
 package com.robrousejr.ohiocovid;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class DateCases {
@@ -31,5 +32,11 @@ public class DateCases {
     @Override
     public String toString() {
         return getDate().toString() + " : " + getCases();
+    }
+
+    public int getDayOfYear() {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        return c.get(Calendar.DAY_OF_YEAR);
     }
 }

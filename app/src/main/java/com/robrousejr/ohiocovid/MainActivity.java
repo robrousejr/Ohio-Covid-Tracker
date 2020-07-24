@@ -3,12 +3,19 @@ package com.robrousejr.ohiocovid;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,21 +61,26 @@ public class MainActivity extends AppCompatActivity {
 
         // Read date/cases from file
         try {
+            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             FileInputStream inputStream = openFileInput(filename);
             BufferedReader r = new BufferedReader(new InputStreamReader(inputStream));
             String line;
             int i = 0;
             while ((line = r.readLine()) != null) {
-                Log.i("File Contents: ", line);
                 if(i == 0)
                     lastRunDate = line; // Date on first line
                 else if (i == 1)
                     cases = line; // Number of cases on second line
+                else if (i > 1){
+                    String[] dateLine = line.split("\t");
+                    DateCases dc = new DateCases(formatter.parse(dateLine[0]), Integer.parseInt(dateLine[1].trim()));
+                    dateCases.add(dc);
+                }
+
                 ++i;
             }
             if (lastRunDate.isEmpty() || cases.isEmpty())
                 throw new Exception("Issue getting date or cases");
-            DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
             dateObj = formatter.parse(lastRunDate);
             r.close();
             inputStream.close();
@@ -88,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             TextView txtView = (TextView) findViewById(R.id.output);
             txtView.setText(cases);
+            showChart();
         }
     }
 
@@ -108,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                    Element totalCasesElement = doc.select("tbody tr td").first();
                    String totalCases = totalCasesElement.text();
                    builder.append(totalCases);
+                    dateCases.clear();
 
                    // Print out new cases from table
                     Elements tableRows = doc.select(".state-history-table tr");
@@ -119,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat formatter = new SimpleDateFormat("MMM"); // 3-letter month name
 
-                        String  month = String.format("%02d",formatter.parse(date[1]).getMonth() + 1); // 2 number month
+                        String month = String.format("%02d", formatter.parse(date[1]).getMonth() + 1); // 2 number month
                         String dayOfMonth = String.format("%02d", Integer.parseInt(date[2])); // 2 number day
                         String year = date[3];
                         Date finalDate = parseDate(year + "-" + month + "-" + dayOfMonth); // Final date
@@ -127,7 +141,7 @@ public class MainActivity extends AppCompatActivity {
                         dateCases.add(dc);
                     }
 
-                    for(DateCases d: dateCases) {
+                    for (DateCases d : dateCases) {
                         Log.i("DateCase: ", d.toString());
                     }
                 } catch (IOException | ParseException e) {
@@ -142,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
                     String output = formatter.format(new Date()) + "\n" + builder.toString() + "\n";
 
                     for(DateCases c : dateCases){
-                        output += c.getDate().toString() + "\t" + c.getCases() + "\n";
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        output += sdf.format(c.getDate()) + "\t" + c.getCases() + "\n";
                     }
 
                     FileOutputStream outputStream = openFileOutput(filename, Context.MODE_PRIVATE);
@@ -161,12 +176,29 @@ public class MainActivity extends AppCompatActivity {
                         TextView output = (TextView) findViewById(R.id.output);
                         output.setText(builder.toString());
 
-                        // Todo: Set graph here to display from dateCases
+                        showChart();
                     }
                 });
             }
 
         }).start();
+    }
+
+    public void showChart() {
+        LineChart chart = (LineChart) findViewById(R.id.chart);
+        List<Entry> entries = new ArrayList<Entry>();
+
+        for(DateCases data : dateCases) {
+            entries.add(new Entry(data.getDayOfYear(), data.getCases()));
+            Log.i("Chart: ", data.getDayOfYear() + "");
+        }
+
+        LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
+        LineData lineData = new LineData(dataSet);
+        chart.setData(lineData);
+        dataSet.setColor(Color.BLACK);
+        dataSet.setValueTextColor(Color.BLUE);
+        chart.invalidate(); // Refresh chart
     }
 
     /**
