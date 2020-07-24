@@ -98,8 +98,7 @@ public class MainActivity extends AppCompatActivity {
         if(isScrape || !compareDateDays(dateObj, new Date())) {
             getWebsite();
         } else {
-            TextView txtView = (TextView) findViewById(R.id.output);
-            txtView.setText(cases);
+            showCases(cases);
             showChart();
         }
     }
@@ -173,9 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView output = (TextView) findViewById(R.id.output);
-                        output.setText(builder.toString());
-
+                        showCases(builder.toString());
                         showChart();
                     }
                 });
@@ -199,6 +196,11 @@ public class MainActivity extends AppCompatActivity {
         dataSet.setColor(Color.BLACK);
         dataSet.setValueTextColor(Color.BLUE);
         chart.invalidate(); // Refresh chart
+    }
+
+    public void showCases(String cases) {
+        TextView output = (TextView) findViewById(R.id.output);
+        output.setText(cases);
     }
 
     /**
