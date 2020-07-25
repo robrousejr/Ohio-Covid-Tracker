@@ -186,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    // Todo: Show by date, instead of number of day of the year it is
+    // Todo: Change display of graph
     public void showChart() {
 
         LineChart chart = (LineChart) findViewById(R.id.chart);
@@ -215,27 +217,6 @@ public class MainActivity extends AppCompatActivity {
         LineData data = new LineData(dataSets);
         chart.setData(data);
         chart.invalidate();
-
-        /*LineChart chart = (LineChart) findViewById(R.id.chart);
-        chart.setDragEnabled(true);
-        chart.setScaleEnabled(true);
-        chart.setDescription(new Description());
-
-        List<Entry> entries = new ArrayList<Entry>();
-
-
-
-        for(DateCases data : dateCases) {
-            entries.add(new Entry(data.getDayOfYear(), data.getCases()));
-            Log.i("Chart: ", data.getDayOfYear() + " " + data.getCases());
-        }
-
-        LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
-        LineData lineData = new LineData(dataSet);
-        chart.setData(lineData);
-        dataSet.setColor(Color.BLACK);
-        dataSet.setValueTextColor(Color.BLUE);
-        chart.invalidate(); // Refresh chart*/
     }
 
     public void showCases(String cases) {
