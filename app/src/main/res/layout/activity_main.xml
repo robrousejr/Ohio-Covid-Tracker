@@ -18,6 +18,7 @@
         android:layout_marginBottom="400dp"
         android:fontFamily="sans-serif-condensed-medium"
         android:textColor="@color/colorPrimaryDark"
+        android:visibility="visible"
         android:textSize="80sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

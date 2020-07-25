@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
         chart.getXAxis().setValueFormatter(new XAxisDateFormatter());
 
         // Chart settings
-        chart.setScaleEnabled(true);
+        chart.setDrawGridBackground(false);
         chart.setDragEnabled(true);
         chart.getDescription().setEnabled(false);
         ArrayList<Entry> yValues = new ArrayList<>();
@@ -214,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
     public void showCases(String cases) {
         TextView output = (TextView) findViewById(R.id.output);
         output.setText(cases);
-        output.setX(-2000);
+        output.setTranslationX(-2000);
         output.animate().translationXBy(2000).setDuration(2000);
     }
 
