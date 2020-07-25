@@ -13,9 +13,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.EntryXComparator;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -38,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -182,12 +187,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showChart() {
+
         LineChart chart = (LineChart) findViewById(R.id.chart);
+        chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+        chart.setScaleEnabled(true);
+        chart.setDragEnabled(true);
+        chart.getDescription().setEnabled(false);
+
+        ArrayList<Entry> yValues = new ArrayList<>();
+
+        for(DateCases dc : dateCases) {
+            Entry newEntry = new Entry(dc.getDayOfYear() + 0, dc.getCases() + 0);
+            yValues.add(newEntry);
+        }
+
+        Collections.sort(yValues, new EntryXComparator());
+        for (Entry a : yValues) {
+            Log.i("Entry", a.getX() + " : " + a.getY());
+        }
+
+
+        LineDataSet ySet = new LineDataSet(yValues, "Cases");
+        ySet.setLineWidth(5f);
+
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(ySet);
+        LineData data = new LineData(dataSets);
+        chart.setData(data);
+        chart.invalidate();
+
+        /*LineChart chart = (LineChart) findViewById(R.id.chart);
+        chart.setDragEnabled(true);
+        chart.setScaleEnabled(true);
+        chart.setDescription(new Description());
+
         List<Entry> entries = new ArrayList<Entry>();
+
+
 
         for(DateCases data : dateCases) {
             entries.add(new Entry(data.getDayOfYear(), data.getCases()));
-            Log.i("Chart: ", data.getDayOfYear() + "");
+            Log.i("Chart: ", data.getDayOfYear() + " " + data.getCases());
         }
 
         LineDataSet dataSet = new LineDataSet(entries, "Label"); // add entries to dataset
@@ -195,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
         chart.setData(lineData);
         dataSet.setColor(Color.BLACK);
         dataSet.setValueTextColor(Color.BLUE);
-        chart.invalidate(); // Refresh chart
+        chart.invalidate(); // Refresh chart*/
     }
 
     public void showCases(String cases) {
