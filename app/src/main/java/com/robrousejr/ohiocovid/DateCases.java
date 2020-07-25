@@ -39,4 +39,5 @@ public class DateCases {
         c.setTime(date);
         return c.get(Calendar.DAY_OF_YEAR);
     }
+
 }

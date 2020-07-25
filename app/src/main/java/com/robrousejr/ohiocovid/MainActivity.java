@@ -1,19 +1,13 @@
 package com.robrousejr.ohiocovid;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
@@ -25,26 +19,21 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -96,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Logging
-        Log.i("Last Scraping Date: ", lastRunDate.toString());
+        Log.i("Last Scraping Date: ", lastRunDate);
         Log.i("Saved Covid Case #", cases);
 
         // Scraping needed
@@ -133,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
                     // Iterate through rows and add all dateCases
                     for(Element e : tableRows) {
                         Elements tableCells = e.getElementsByTag("td");
-                        String date[] = tableCells.get(0).text().split(" ");
+                        String[] date = tableCells.get(0).text().split(" ");
                         Calendar calendar = Calendar.getInstance();
                         SimpleDateFormat formatter = new SimpleDateFormat("MMM"); // 3-letter month name
 
@@ -186,31 +175,34 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
-    // Todo: Show by date, instead of number of day of the year it is
     // Todo: Change display of graph
     public void showChart() {
 
         LineChart chart = (LineChart) findViewById(R.id.chart);
         chart.getXAxis().setPosition(XAxis.XAxisPosition.BOTTOM);
+
+        // Sets value formatter
+        chart.getXAxis().setValueFormatter(new XAxisDateFormatter());
+
+        // Chart settings
         chart.setScaleEnabled(true);
         chart.setDragEnabled(true);
         chart.getDescription().setEnabled(false);
-
         ArrayList<Entry> yValues = new ArrayList<>();
 
-        for(DateCases dc : dateCases) {
-            Entry newEntry = new Entry(dc.getDayOfYear() + 0, dc.getCases() + 0);
+        // Sort by increasing order
+        Collections.reverse(dateCases);
+
+        for (DateCases dc : dateCases) {
+            Entry newEntry = new Entry((float) dc.getDate().getTime() / 1000, (float) dc.getCases(), dc);
             yValues.add(newEntry);
         }
 
         Collections.sort(yValues, new EntryXComparator());
-        for (Entry a : yValues) {
-            Log.i("Entry", a.getX() + " : " + a.getY());
-        }
 
-
-        LineDataSet ySet = new LineDataSet(yValues, "Cases");
+        LineDataSet ySet = new LineDataSet(yValues, "Number of Cases");
         ySet.setLineWidth(5f);
+        ySet.setDrawValues(false);
 
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(ySet);
