@@ -1,5 +1,6 @@
 # Ohio-Covid-Tracker
-Android app to keep track of daily coronavirus statistics for Ohio
+Android app to keep track of daily coronavirus statistics for Ohio. 
+This app has never been released publicly. 
 
 ## How it Works
   - Scrapes web data daily and stores the data
