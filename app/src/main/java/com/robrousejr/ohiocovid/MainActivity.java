@@ -214,6 +214,8 @@ public class MainActivity extends AppCompatActivity {
     public void showCases(String cases) {
         TextView output = (TextView) findViewById(R.id.output);
         output.setText(cases);
+        output.setX(-2000);
+        output.animate().translationXBy(2000).setDuration(2000);
     }
 
     /**
